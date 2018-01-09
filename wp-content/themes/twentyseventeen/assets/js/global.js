@@ -1,19 +1,19 @@
 /* global twentyseventeenScreenReaderText */
-(function( $ ) {
+(function() {
 
 	// Variables and DOM Caching.
-	var $body = $( 'body' ),
-		$customHeader = $body.find( '.custom-header' ),
-		$branding = $customHeader.find( '.site-branding' ),
-		$navigation = $body.find( '.navigation-top' ),
-		$navWrap = $navigation.find( '.wrap' ),
-		$navMenuItem = $navigation.find( '.menu-item' ),
-		$menuToggle = $navigation.find( '.menu-toggle' ),
-		$menuScrollDown = $body.find( '.menu-scroll-down' ),
-		$sidebar = $body.find( '#secondary' ),
-		$entryContent = $body.find( '.entry-content' ),
-		$formatQuote = $body.find( '.format-quote blockquote' ),
-		isFrontPage = $body.hasClass( 'twentyseventeen-front-page' ) || $body.hasClass( 'home blog' ),
+	var $body = document.querySelector( 'body' ),
+		$customHeader = $body.querySelectorAll( '.custom-header' ),
+		$branding = $customHeader.querySelectorAll( '.site-branding' ),
+		$navigation = $body.querySelectorAll( '.navigation-top' ),
+		$navWrap = $navigation.querySelectorAll( '.wrap' ),
+		$navMenuItem = $navigation.querySelectorAll( '.menu-item' ),
+		$menuToggle = $navigation.querySelectorAll( '.menu-toggle' ),
+		$menuScrollDown = $body.querySelectorAll( '.menu-scroll-down' ),
+		$sidebar = $body.querySelector( '#secondary' ),
+		$entryContent = $body.querySelectorAll( '.entry-content' ),
+		$formatQuote = $body.querySelectorAll( '.format-quote blockquote' ),
+		isFrontPage = $body.classList.contains( 'twentyseventeen-front-page' ) || ( $body.classList.contains( 'home' ) && $body.classList.contains( 'blog' ) ),
 		navigationFixedClass = 'site-navigation-fixed',
 		navigationHeight,
 		navigationOuterHeight,
@@ -26,23 +26,30 @@
 		resizeTimer;
 
 	// Ensure the sticky navigation doesn't cover current focused links.
-	$( 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]', '.site-content-contain' ).filter( ':visible' ).focus( function() {
-		if ( $navigation.hasClass( 'site-navigation-fixed' ) ) {
-			var windowScrollTop = $( window ).scrollTop(),
-				fixedNavHeight = $navigation.height(),
-				itemScrollTop = $( this ).offset().top,
-				offsetDiff = itemScrollTop - windowScrollTop;
-
-			// Account for Admin bar.
-			if ( $( '#wpadminbar' ).length ) {
-				offsetDiff -= $( '#wpadminbar' ).height();
-			}
-
-			if ( offsetDiff < fixedNavHeight ) {
-				$( window ).scrollTo( itemScrollTop - ( fixedNavHeight + 50 ), 0 );
-			}
+	document.querySelectorAll( 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]', '.site-content-contain' ).forEach( function( element ) {
+		if ( element.offsetWidth === 0 && element.offsetHeight === 0 ) {
+			// Invisible element, skip.
+			return;
 		}
-	});
+		element.addEventListener( 'focus', function() {
+			if ( $navigation.classList.contains( 'site-navigation-fixed' ) ) {
+				var windowScrollTop = $( window ).scrollTop(),
+					fixedNavHeight = $navigation.height(),
+					itemScrollTop = $( this ).offset().top,
+					offsetDiff = itemScrollTop - windowScrollTop;
+
+				// Account for Admin bar.
+				var adminBar = document.querySelector( '#wpadminbar' );
+				if ( adminBar ) {
+					offsetDiff -= adminBar.offsetHeight;
+				}
+
+				if ( offsetDiff < fixedNavHeight ) {
+					$( window ).scrollTo( itemScrollTop - ( fixedNavHeight + 50 ), 0 );
+				}
+			}
+		} );
+	} );
 
 	// Set properties of navigation.
 	function setNavProps() {
@@ -246,4 +253,4 @@
 		$body.addClass( 'has-header-video' );
 	});
 
-})( jQuery );
+})();
